@@ -89,15 +89,12 @@ export default function DebateCard({ debater, onVote, isTop }: DebateCardProps) 
       onMouseLeave={handleEnd}
       onTouchStart={(e) => {
         handleStart(e.touches[0].clientX, e.touches[0].clientY);
-        e.preventDefault();
       }}
       onTouchMove={(e) => {
         handleMove(e.touches[0].clientX, e.touches[0].clientY);
-        e.preventDefault();
       }}
-      onTouchEnd={(e) => {
+      onTouchEnd={() => {
         handleEnd();
-        e.preventDefault();
       }}
     >
       <div
@@ -180,10 +177,11 @@ export default function DebateCard({ debater, onVote, isTop }: DebateCardProps) 
 
           {/* Side */}
           <div
-            className="px-2.5 py-0.5 md:px-3 md:py-1 font-bold text-white text-[10px] md:text-xs mb-3 md:mb-5"
+            className="font-bold text-white text-[10px] md:text-xs mb-3 md:mb-5"
             style={{
               backgroundColor: debater.side === 'MOVE' ? '#6366f1' : '#f59e0b',
               border: '2px solid black',
+              padding: '5px',
             }}
           >
             {debater.side}
@@ -193,26 +191,30 @@ export default function DebateCard({ debater, onVote, isTop }: DebateCardProps) 
           <div className="flex gap-2.5 md:gap-3" style={{ marginTop: '5px', marginBottom: '25px' }}>
             <button
               onClick={() => handleButtonClick('sucks')}
-              className="rounded-full flex items-center justify-center transition-transform hover:scale-110 w-[42px] h-[42px] md:w-[55px] md:h-[55px]"
+              className="font-bold text-white transition-transform hover:scale-110 text-sm md:text-base"
               style={{
                 backgroundColor: '#ff3b3b',
                 border: '3px solid black',
+                borderRadius: '8px',
+                padding: '10px 20px',
               }}
               disabled={!isTop}
             >
-              <span className="text-xl md:text-3xl">👎</span>
+              SUCKS
             </button>
 
             <button
               onClick={() => handleButtonClick('fucks')}
-              className="rounded-full flex items-center justify-center transition-transform hover:scale-110 w-[42px] h-[42px] md:w-[55px] md:h-[55px]"
+              className="font-bold text-white transition-transform hover:scale-110 text-sm md:text-base"
               style={{
                 backgroundColor: '#00d66a',
                 border: '3px solid black',
+                borderRadius: '8px',
+                padding: '10px 20px',
               }}
               disabled={!isTop}
             >
-              <span className="text-xl md:text-3xl">👍</span>
+              FUCKS
             </button>
           </div>
         </div>

@@ -276,10 +276,13 @@ export default function VotingArena({ username }: VotingArenaProps) {
 
             <button
               onClick={logout}
-              className="text-xs md:text-sm px-3 py-1 font-bold text-gray-700 transition-opacity hover:opacity-70"
+              className="font-bold text-white text-sm sm:text-base md:text-lg transition-opacity hover:opacity-90 rounded-lg"
               style={{
-                border: '2px solid black',
-                backgroundColor: 'white'
+                backgroundColor: '#ff3333',
+                border: '3px solid black',
+                boxShadow: '3px 3px 0px black',
+                padding: '8px 20px',
+                marginTop: '10px',
               }}
             >
               LOGOUT
