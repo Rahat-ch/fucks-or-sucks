@@ -12,8 +12,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
           theme: 'light',
           accentColor: '#0099ff',
         },
-        // Login methods - email only
-        loginMethods: ['email'],
+        // Login methods - email, google, twitter, and farcaster
+        loginMethods: ['email', 'google', 'twitter', 'farcaster'],
         // Configure embedded wallets
         embeddedWallets: {
           ethereum: {
