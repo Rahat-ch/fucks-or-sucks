@@ -24,22 +24,38 @@ export async function POST(request: NextRequest) {
     }
 
     // Call Shinami Gas Station REST API directly to avoid fetch conflicts
-    const response = await fetch('https://api.us1.shinami.com/movement/gas/v1/', {
+    const requestBody = {
+      jsonrpc: '2.0',
+      method: 'gas_sponsorAndSubmitSignedTransaction',
+      params: [serializedTransaction, senderSignature],
+      id: 1,
+    };
+
+    // Use URL-based authentication as per Shinami docs
+    const apiUrl = `https://api.us1.shinami.com/movement/gas/v1/${apiKey}`;
+
+    console.log('Request to Shinami:', {
+      url: apiUrl.replace(apiKey, apiKey?.substring(0, 20) + '...'),
+      body: requestBody,
+    });
+
+    const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
-        'X-API-Key': apiKey,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        jsonrpc: '2.0',
-        method: 'gas_sponsorAndSubmitSignedTransaction',
-        params: [serializedTransaction, senderSignature],
-        id: 1,
-      }),
+      body: JSON.stringify(requestBody),
+    });
+
+    console.log('Response from Shinami:', {
+      status: response.status,
+      statusText: response.statusText,
+      headers: Object.fromEntries(response.headers.entries()),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
+      console.error('Shinami API error response:', errorText);
       throw new Error(`Shinami API error: ${response.status} ${errorText}`);
     }
 
