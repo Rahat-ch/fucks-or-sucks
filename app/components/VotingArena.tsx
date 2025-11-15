@@ -27,8 +27,8 @@ interface PendingVotes {
 }
 
 // The two debaters - always both visible
-const shayan: Debater = { id: 1, name: 'Shayan', side: 'MOVE' };
-const dhai: Debater = { id: 2, name: 'Dhai.eth', side: 'EVM' };
+const shayan: Debater = { id: 1, name: 'Shayan', side: 'MOVE', image: '/shayan.jpg' };
+const dhai: Debater = { id: 2, name: 'Dhai.eth', side: 'EVM', image: '/dhai.jpg' };
 
 export default function VotingArena({ username }: VotingArenaProps) {
   const { logout, user } = usePrivy();
