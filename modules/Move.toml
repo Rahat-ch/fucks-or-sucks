@@ -1,0 +1,16 @@
+[package]
+name = "votes"
+version = "1.0.0"
+authors = []
+
+[addresses]
+votes="0x1d5b9af2cd921ab84053a9e5dc31425d61796e3976246a719eb174a925e531e7"
+
+[dev-addresses]
+
+[dependencies.AptosFramework]
+git = "https://github.com/movementlabsxyz/aptos-core.git"
+rev = "movement"
+subdir = "aptos-move/framework/aptos-framework"
+
+[dev-dependencies]
