@@ -7,6 +7,7 @@ import DebateCard from './DebateCard';
 import { truncateAddress } from '../utils/address';
 import { submitBatchVoteTransactions, fetchVoteCounts, VoteTransaction } from '../lib/transactions';
 import { getExplorerUrl } from '../lib/aptos';
+import { useGameStatus } from '../contexts/GameStatusContext';
 
 interface VotingArenaProps {
   username: string;
@@ -33,10 +34,19 @@ const dhai: Debater = { id: 2, name: 'Dhai.eth', side: 'EVM', image: '/dhai.jpg'
 export default function VotingArena({ username }: VotingArenaProps) {
   const { logout, user } = usePrivy();
   const { signRawHash } = useSignRawHash();
+  const { isPaused, winner } = useGameStatus();
 
   // Display votes (local state for instant feedback)
   const [shayanVotes, setShayanVotes] = useState({ fucks: 0, sucks: 0 });
   const [dhaiVotes, setDhaiVotes] = useState({ fucks: 0, sucks: 0 });
+
+  // Cached vote counts (for winner display)
+  const [cachedVotes, setCachedVotes] = useState<{
+    shayan_fucks: number;
+    shayan_sucks: number;
+    dhai_fucks: number;
+    dhai_sucks: number;
+  } | null>(null);
 
   // Pending votes (not yet synced to blockchain)
   const [pendingVotes, setPendingVotes] = useState<PendingVotes>({
@@ -70,6 +80,23 @@ export default function VotingArena({ username }: VotingArenaProps) {
       });
     }
   }, [moveWallet, walletAddress, publicKeyHex]);
+
+  // Fetch cached vote counts when winner is declared
+  useEffect(() => {
+    if (winner) {
+      const fetchCachedVotes = async () => {
+        try {
+          const counts = await fetchVoteCounts();
+          if (counts) {
+            setCachedVotes(counts);
+          }
+        } catch (error) {
+          console.error('Error fetching cached votes for winner display:', error);
+        }
+      };
+      fetchCachedVotes();
+    }
+  }, [winner]);
 
   const handleVote = (debater: Debater, vote: 'fucks' | 'sucks') => {
     const voteKey = `${debater.id === 1 ? 'shayan' : 'dhai'}_${vote}` as keyof PendingVotes;
@@ -298,6 +325,17 @@ export default function VotingArena({ username }: VotingArenaProps) {
                 debater={shayan}
                 onVote={(vote) => handleVote(shayan, vote)}
                 isTop={true}
+                isPaused={isPaused}
+                showResults={!!winner}
+                voteStats={
+                  cachedVotes
+                    ? {
+                        fucks: cachedVotes.shayan_fucks,
+                        sucks: cachedVotes.shayan_sucks,
+                        weightedScore: cachedVotes.shayan_fucks - cachedVotes.shayan_sucks,
+                      }
+                    : undefined
+                }
               />
             </div>
 
@@ -308,24 +346,52 @@ export default function VotingArena({ username }: VotingArenaProps) {
                 debater={dhai}
                 onVote={(vote) => handleVote(dhai, vote)}
                 isTop={true}
+                isPaused={isPaused}
+                showResults={!!winner}
+                voteStats={
+                  cachedVotes
+                    ? {
+                        fucks: cachedVotes.dhai_fucks,
+                        sucks: cachedVotes.dhai_sucks,
+                        weightedScore: cachedVotes.dhai_fucks - cachedVotes.dhai_sucks,
+                      }
+                    : undefined
+                }
               />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Vote Counter Footer */}
-      <div
-        className="py-2 md:py-3 text-center flex-shrink-0"
-        style={{
-          backgroundColor: 'white',
-          borderTop: '5px solid black',
-        }}
-      >
-        <p className="text-base md:text-lg font-bold text-gray-700 px-2">
-          Total votes will be revealed at the end! 🔥
-        </p>
-      </div>
+      {/* Footer - Winner Display or Regular Message */}
+      {winner ? (
+        <div
+          className="py-3 md:py-4 text-center flex-shrink-0"
+          style={{
+            background: 'linear-gradient(135deg, #ffd700 0%, #ffed4e 100%)',
+            borderTop: '5px solid black',
+          }}
+        >
+          <div className="px-4">
+            <p className="text-sm md:text-base font-black text-black mb-1">🏆 WINNER DECLARED! 🏆</p>
+            <h2 className="text-3xl md:text-5xl font-black text-black" style={{ letterSpacing: '0.05em' }}>
+              {winner.name.toUpperCase()}
+            </h2>
+          </div>
+        </div>
+      ) : (
+        <div
+          className="py-2 md:py-3 text-center flex-shrink-0"
+          style={{
+            backgroundColor: 'white',
+            borderTop: '5px solid black',
+          }}
+        >
+          <p className="text-base md:text-lg font-bold text-gray-700 px-2">
+            Total votes will be revealed at the end! 🔥
+          </p>
+        </div>
+      )}
     </div>
   );
 }

@@ -9,26 +9,35 @@ interface Debater {
   image?: string;
 }
 
+interface VoteStats {
+  fucks: number;
+  sucks: number;
+  weightedScore: number;
+}
+
 interface DebateCardProps {
   debater: Debater;
   onVote: (vote: 'fucks' | 'sucks') => void;
   isTop: boolean;
+  isPaused?: boolean;
+  showResults?: boolean;
+  voteStats?: VoteStats;
 }
 
-export default function DebateCard({ debater, onVote, isTop }: DebateCardProps) {
+export default function DebateCard({ debater, onVote, isTop, isPaused = false, showResults = false, voteStats }: DebateCardProps) {
   const [swipeDirection, setSwipeDirection] = useState<'left' | 'right' | null>(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
 
   const handleStart = (clientX: number, clientY: number) => {
-    if (!isTop) return;
+    if (!isTop || isPaused) return;
     setIsDragging(true);
     setStartPos({ x: clientX, y: clientY });
   };
 
   const handleMove = (clientX: number, clientY: number) => {
-    if (!isDragging || !isTop) return;
+    if (!isDragging || !isTop || isPaused) return;
 
     const deltaX = clientX - startPos.x;
     const deltaY = clientY - startPos.y;
@@ -43,7 +52,7 @@ export default function DebateCard({ debater, onVote, isTop }: DebateCardProps) 
   };
 
   const handleEnd = () => {
-    if (!isDragging || !isTop) return;
+    if (!isDragging || !isTop || isPaused) return;
     setIsDragging(false);
 
     // If swiped far enough, trigger vote
@@ -187,36 +196,85 @@ export default function DebateCard({ debater, onVote, isTop }: DebateCardProps) 
             {debater.side}
           </div>
 
-          {/* Buttons */}
-          <div className="flex gap-2.5 md:gap-3" style={{ marginTop: '5px', marginBottom: '25px' }}>
-            <button
-              onClick={() => handleButtonClick('sucks')}
-              className="font-bold text-white transition-transform hover:scale-110 text-sm md:text-base"
-              style={{
-                backgroundColor: '#ff3b3b',
-                border: '3px solid black',
-                borderRadius: '8px',
-                padding: '10px 20px',
-              }}
-              disabled={!isTop}
-            >
-              SUCKS
-            </button>
+          {/* Buttons or Results */}
+          {showResults && voteStats ? (
+            <div className="w-full px-8 md:px-12" style={{ marginTop: '5px', marginBottom: '25px' }}>
+              <div className="space-y-2">
+                <div className="flex justify-around items-center">
+                  <span className="font-bold text-sm md:text-base">FUCKS:</span>
+                  <span
+                    className="font-black text-lg md:text-xl px-3 py-1 rounded"
+                    style={{
+                      backgroundColor: '#00d66a',
+                      color: 'white',
+                      border: '2px solid black',
+                    }}
+                  >
+                    {voteStats.fucks}
+                  </span>
+                </div>
+                <div className="flex justify-around items-center">
+                  <span className="font-bold text-sm md:text-base">SUCKS:</span>
+                  <span
+                    className="font-black text-lg md:text-xl px-3 py-1 rounded"
+                    style={{
+                      backgroundColor: '#ff3b3b',
+                      color: 'white',
+                      border: '2px solid black',
+                    }}
+                  >
+                    {voteStats.sucks}
+                  </span>
+                </div>
+                <div
+                  className="flex justify-around items-center pt-2"
+                  style={{ borderTop: '2px solid #ccc' }}
+                >
+                  <span className="font-black text-sm md:text-base">WEIGHTED SCORE:</span>
+                  <span
+                    className="font-black text-xl md:text-2xl px-3 py-1 rounded"
+                    style={{
+                      backgroundColor: voteStats.weightedScore > 0 ? '#ffd700' : '#gray-300',
+                      color: 'black',
+                      border: '3px solid black',
+                    }}
+                  >
+                    {voteStats.weightedScore}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="flex gap-2.5 md:gap-3" style={{ marginTop: '5px', marginBottom: '25px' }}>
+              <button
+                onClick={() => handleButtonClick('sucks')}
+                className="font-bold text-white transition-transform hover:scale-110 text-sm md:text-base disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  backgroundColor: '#ff3b3b',
+                  border: '3px solid black',
+                  borderRadius: '8px',
+                  padding: '10px 20px',
+                }}
+                disabled={!isTop || isPaused}
+              >
+                SUCKS
+              </button>
 
-            <button
-              onClick={() => handleButtonClick('fucks')}
-              className="font-bold text-white transition-transform hover:scale-110 text-sm md:text-base"
-              style={{
-                backgroundColor: '#00d66a',
-                border: '3px solid black',
-                borderRadius: '8px',
-                padding: '10px 20px',
-              }}
-              disabled={!isTop}
-            >
-              FUCKS
-            </button>
-          </div>
+              <button
+                onClick={() => handleButtonClick('fucks')}
+                className="font-bold text-white transition-transform hover:scale-110 text-sm md:text-base disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  backgroundColor: '#00d66a',
+                  border: '3px solid black',
+                  borderRadius: '8px',
+                  padding: '10px 20px',
+                }}
+                disabled={!isTop || isPaused}
+              >
+                FUCKS
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

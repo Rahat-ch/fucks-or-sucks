@@ -31,17 +31,16 @@ export async function POST(request: NextRequest) {
       id: 1,
     };
 
-    // Use URL-based authentication as per Shinami docs
-    const apiUrl = `https://api.us1.shinami.com/movement/gas/v1/${apiKey}`;
-
     console.log('Request to Shinami:', {
-      url: apiUrl.replace(apiKey, apiKey?.substring(0, 20) + '...'),
+      url: 'https://api.us1.shinami.com/movement/gas/v1',
+      apiKeyPrefix: apiKey?.substring(0, 25) + '...',
       body: requestBody,
     });
 
-    const response = await fetch(apiUrl, {
+    const response = await fetch('https://api.us1.shinami.com/movement/gas/v1', {
       method: 'POST',
       headers: {
+        'X-API-Key': apiKey,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(requestBody),

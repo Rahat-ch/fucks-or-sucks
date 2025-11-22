@@ -12,12 +12,14 @@
     "@aptos-labs/ts-sdk": "^5.1.4",
     "@privy-io/react-auth": "^3.7.0",
     "@shinami/clients": "^0.9.7",
+    "better-sqlite3": "^12.4.6",
     "next": "16.0.2",
     "react": "19.2.0",
     "react-dom": "19.2.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
